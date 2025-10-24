@@ -27,20 +27,23 @@ class KalkulatorBMIScreen extends StatefulWidget {
 class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
   final _weightController = TextEditingController();
   final _heightController = TextEditingController();
-  final _genderController = TextEditingController();
+  String? _gender; // "L" atau "P"
 
   double? _bmiResult;
   String? _bmiInterpretation = "Silahkan masukkan data anda!";
   String? _generInterpretation = "";
   Color _resultColor = Colors.white;
 
+  Color get _resultTextColor =>
+      _resultColor.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+
   void _calculateBMI() {
     final double weight = double.tryParse(_weightController.text) ?? 0;
     final double heightInCm = double.tryParse(_heightController.text) ?? 0;
-    final String gender = _genderController.text.toLowerCase() ?? "";
+    final String gender = (_gender ?? "").toLowerCase();
 
     setState(() {
-      if (gender == "l"){
+      if (gender == "l") {
         if (weight > 0 && heightInCm > 0) {
           final double heightInM = heightInCm / 100;
           final double bmi = weight / (heightInM * heightInM);
@@ -61,8 +64,9 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
         } else {
           _bmiResult = null;
           _bmiInterpretation = "Silahkan masukkan data yang valid!";
+          _resultColor = Colors.white;
         }
-      }else if (gender == "p"){
+      } else if (gender == "p") {
         if (weight > 0 && heightInCm > 0) {
           final double heightInM = heightInCm / 100;
           final double bmi = weight / (heightInM * heightInM);
@@ -83,10 +87,13 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
         } else {
           _bmiResult = null;
           _bmiInterpretation = "Silahkan masukkan data yang valid!";
+          _resultColor = Colors.white;
         }
-      }else{
-        _generInterpretation = "Jenis kelamin tidak valid!";
-      }    
+      } else {
+        _bmiResult = null;
+        _bmiInterpretation = "Silahkan pilih jenis kelamin!";
+        _resultColor = Colors.white;
+      }
     });
   }
 
@@ -94,7 +101,7 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
     setState(() {
       _weightController.clear();
       _heightController.clear();
-      _genderController.clear();
+      _gender = null;
       _bmiResult = null;
       _bmiInterpretation = "Silahkan masukkan data anda!";
       _generInterpretation = "";
@@ -102,7 +109,7 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
     });
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -158,31 +165,31 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
                           ElevatedButton.icon(
                             onPressed: () {
                               setState(() {
-                                _genderController.text = "L";
+                                _gender = "L";
                               });
                             },
                             icon: Icon(Icons.male),
                             label: Text("Laki-laki"),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _genderController.text == "L" 
-                                  ? Colors.indigo 
-                                  : Colors.grey,
-                              foregroundColor: Colors.white,
+                              backgroundColor:
+                                  _gender == "L" ? Colors.indigo : Colors.grey[300],
+                              foregroundColor:
+                                  _gender == "L" ? Colors.white : Colors.black,
                             ),
                           ),
                           ElevatedButton.icon(
                             onPressed: () {
                               setState(() {
-                                _genderController.text = "P";
+                                _gender = "P";
                               });
                             },
                             icon: Icon(Icons.female),
                             label: Text("Perempuan"),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _genderController.text == "P" 
-                                  ? Colors.indigo 
-                                  : Colors.grey,
-                              foregroundColor: Colors.white,
+                              backgroundColor:
+                                  _gender == "P" ? Colors.indigo : Colors.grey[300],
+                              foregroundColor:
+                                  _gender == "P" ? Colors.white : Colors.black,
                             ),
                           ),
                         ],
@@ -202,6 +209,7 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       backgroundColor: Colors.white,
+                      foregroundColor: Colors.indigo,
                     ),
                   ),
                   ElevatedButton.icon(
@@ -211,6 +219,7 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       backgroundColor: Colors.white,
+                      foregroundColor: Colors.indigo,
                     ),
                   ),
                 ],
@@ -227,7 +236,7 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
                         "Hasil BMI",
                         style: TextStyle(
                           fontSize: 24,
-                          color: Colors.indigo,
+                          color: _resultTextColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -236,19 +245,19 @@ class _KalkulatorBMIScreenState extends State<KalkulatorBMIScreen> {
                         _bmiResult?.toStringAsFixed(1) ?? "--",
                         style: TextStyle(
                           fontSize: 48,
-                          color: Colors.indigo,
+                          color: _resultTextColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
                         _bmiInterpretation ?? "",
-                        style: TextStyle(fontSize: 20, color: Colors.white),
+                        style: TextStyle(fontSize: 20, color: _resultTextColor),
                         textAlign: TextAlign.center,
                       ),
                       Text(
                         _generInterpretation ?? "",
-                        style: TextStyle(fontSize: 20, color: Colors.white),
+                        style: TextStyle(fontSize: 20, color: _resultTextColor),
                         textAlign: TextAlign.center,
                       ),
                     ],
